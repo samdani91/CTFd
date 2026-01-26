@@ -29,8 +29,11 @@ services:
     restart: always
     volumes:
       - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/iitctf.me.pem:/etc/nginx/certs/iitctf.me.pem
+      - ./conf/nginx/iitctf.me.key:/etc/nginx/certs/iitctf.me.key
     ports:
       - 80:80
+      - 443:443
     depends_on:
       - ctfd
 
