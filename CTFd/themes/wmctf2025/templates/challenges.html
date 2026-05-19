@@ -10,6 +10,12 @@
             <i class="fas fa-flag text-primary me-2"></i>
             {% trans %}Challenges{% endtrans %}
           </h1>
+          <div class="ctf-timer-wrap d-flex justify-content-center mb-2" x-data="CtfHeaderTimer" x-init="init()">
+            <div class="ctf-timer-card" :class="timerClass">
+              <div class="ctf-timer-label" x-text="timerLabel"></div>
+              <div class="ctf-timer-value" x-text="timerValue"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -786,10 +792,155 @@
       box-shadow: none !important;
     }
 
+    /* Challenge header timer */
+    .ctf-timer-card {
+      position: relative;
+      overflow: hidden;
+      min-width: 300px;
+      padding: 0.78rem 1.25rem;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 122, 255, 0.35);
+      background:
+        radial-gradient(120% 130% at 0% 0%, rgba(82, 170, 255, 0.2) 0%, rgba(82, 170, 255, 0) 48%),
+        linear-gradient(140deg, rgba(0, 76, 189, 0.2) 0%, rgba(0, 18, 72, 0.1) 55%, rgba(79, 70, 229, 0.14) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.26),
+        0 10px 28px rgba(0, 20, 70, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: box-shadow 0.28s ease, border-color 0.28s ease;
+    }
+
+    .ctf-timer-card::before {
+      content: "";
+      position: absolute;
+      inset: -30% auto auto -22%;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(120, 220, 255, 0.22) 0%, rgba(120, 220, 255, 0) 70%);
+      pointer-events: none;
+    }
+
+    .ctf-timer-card::after {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -65%;
+      width: 44%;
+      height: 190%;
+      transform: rotate(18deg);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.28) 50%, rgba(255, 255, 255, 0) 100%);
+      animation: ctfTimerSheen 5.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .ctf-timer-card:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 12px 32px rgba(0, 20, 70, 0.26);
+    }
+
+    .ctf-timer-card.timer-running {
+      border-color: rgba(48, 209, 88, 0.5);
+      background:
+        radial-gradient(115% 120% at 0% 0%, rgba(110, 255, 188, 0.2) 0%, rgba(110, 255, 188, 0) 48%),
+        linear-gradient(140deg, rgba(20, 112, 68, 0.2) 0%, rgba(13, 54, 37, 0.1) 55%, rgba(0, 122, 255, 0.14) 100%);
+    }
+
+    .ctf-timer-card.timer-ended {
+      border-color: rgba(255, 93, 84, 0.5);
+      background:
+        radial-gradient(115% 120% at 0% 0%, rgba(255, 159, 121, 0.22) 0%, rgba(255, 159, 121, 0) 46%),
+        linear-gradient(140deg, rgba(160, 42, 54, 0.2) 0%, rgba(86, 27, 35, 0.12) 58%, rgba(233, 116, 51, 0.14) 100%);
+    }
+
+    .ctf-timer-label {
+      position: relative;
+      z-index: 1;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(15, 42, 95, 0.78);
+    }
+
+    .ctf-timer-value {
+      position: relative;
+      z-index: 1;
+      margin-top: 0.14rem;
+      font-size: 1.28rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #082453;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    [data-bs-theme="dark"] .ctf-timer-card {
+      border-color: rgba(112, 176, 255, 0.5);
+      background:
+        radial-gradient(120% 130% at 0% 0%, rgba(0, 172, 255, 0.22) 0%, rgba(0, 172, 255, 0) 46%),
+        linear-gradient(145deg, rgba(15, 35, 95, 0.82) 0%, rgba(7, 22, 56, 0.86) 58%, rgba(48, 61, 144, 0.82) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.13),
+        0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    [data-bs-theme="dark"] .ctf-timer-card.timer-running {
+      border-color: rgba(92, 232, 140, 0.55);
+      background:
+        radial-gradient(120% 130% at 0% 0%, rgba(56, 255, 166, 0.22) 0%, rgba(56, 255, 166, 0) 46%),
+        linear-gradient(145deg, rgba(18, 64, 50, 0.84) 0%, rgba(10, 43, 34, 0.88) 58%, rgba(19, 82, 132, 0.8) 100%);
+    }
+
+    [data-bs-theme="dark"] .ctf-timer-card.timer-ended {
+      border-color: rgba(255, 124, 114, 0.52);
+      background:
+        radial-gradient(120% 130% at 0% 0%, rgba(255, 145, 115, 0.23) 0%, rgba(255, 145, 115, 0) 46%),
+        linear-gradient(145deg, rgba(104, 28, 42, 0.84) 0%, rgba(70, 18, 31, 0.9) 58%, rgba(120, 62, 28, 0.82) 100%);
+    }
+
+    [data-bs-theme="dark"] .ctf-timer-label {
+      color: rgba(225, 236, 255, 0.82);
+    }
+
+    [data-bs-theme="dark"] .ctf-timer-value {
+      color: #f4f8ff;
+      text-shadow: 0 1px 10px rgba(88, 164, 255, 0.2);
+    }
+
+    @keyframes ctfTimerSheen {
+      0% {
+        left: -65%;
+      }
+      50% {
+        left: 128%;
+      }
+      100% {
+        left: 128%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ctf-timer-card::after {
+        animation: none;
+      }
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .challenge-card:hover {
         transform: translateY(-4px) scale(1.01);
+      }
+
+      .ctf-timer-card {
+        min-width: 250px;
+        padding: 0.6rem 0.9rem;
+      }
+
+      .ctf-timer-value {
+        font-size: 1.05rem;
       }
       
       .hero-animation {
@@ -801,6 +952,92 @@
   <script>
     // ActivityFeed Alpine component for notifications and activity
     document.addEventListener('alpine:init', () => {
+      Alpine.data('CtfHeaderTimer', () => ({
+        timerLabel: 'CTF Starts In',
+        timerValue: 'Not set',
+        timerClass: '',
+
+        init() {
+          this.updateCountdowns();
+          setInterval(() => {
+            this.updateCountdowns();
+          }, 1000);
+        },
+
+        formatCountdown(targetTs) {
+          if (!targetTs && targetTs !== 0) {
+            return 'Not set';
+          }
+
+          const now = Math.floor(Date.now() / 1000);
+          let delta = Number(targetTs) - now;
+
+          if (!Number.isFinite(delta)) {
+            return 'Not set';
+          }
+
+          if (delta <= 0) {
+            return '00:00:00';
+          }
+
+          const days = Math.floor(delta / 86400);
+          delta %= 86400;
+          const hours = Math.floor(delta / 3600);
+          delta %= 3600;
+          const minutes = Math.floor(delta / 60);
+          const seconds = delta % 60;
+
+          const dayPart = days > 0 ? `${days}d ` : '';
+          return `${dayPart}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        },
+
+        updateCountdowns() {
+          const now = Math.floor(Date.now() / 1000);
+          const rawStart = window?.init?.start;
+          const rawEnd = window?.init?.end;
+          const startTs = Number(rawStart);
+          const endTs = Number(rawEnd);
+          const hasStart = Number.isFinite(startTs);
+          const hasEnd = Number.isFinite(endTs);
+
+          // Pre-start phase
+          if (hasStart && now < startTs) {
+            this.timerLabel = 'CTF Starts In';
+            this.timerValue = this.formatCountdown(startTs);
+            this.timerClass = '';
+            return;
+          }
+
+          // Ended phase
+          if (hasEnd && now >= endTs) {
+            this.timerLabel = 'CTF Status';
+            this.timerValue = 'CTF Ended';
+            this.timerClass = 'timer-ended';
+            return;
+          }
+
+          // Running phase
+          if (hasEnd) {
+            this.timerLabel = 'CTF Ends In';
+            this.timerValue = this.formatCountdown(endTs);
+            this.timerClass = 'timer-running';
+            return;
+          }
+
+          // Fallback when only start exists and has passed (running without end time)
+          if (hasStart && now >= startTs) {
+            this.timerLabel = 'CTF Status';
+            this.timerValue = 'Running';
+            this.timerClass = 'timer-running';
+            return;
+          }
+
+          this.timerLabel = 'CTF Status';
+          this.timerValue = 'Time Not Set';
+          this.timerClass = '';
+        },
+      }));
+
       Alpine.data('ActivityFeed', () => ({
         activeTab: 'notifications',
         notifications: [],
